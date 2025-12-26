@@ -1,0 +1,778 @@
+@import './bootstrap.css';
+@font-face {
+    font-family: 'GE Flow';
+    src: url('../fonts/GEFlow/GE-Flow-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+:root {
+    --bs-body-font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bs-heading-color: #FFFFFF;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: sans-serif;
+    background-color: #000;
+}
+
+section {
+    height: 100svh;
+    width: 100vw;
+    position: relative;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;
+}
+
+#loading-game {
+    background-image: url("/assets/imgs/loading-bg.png");
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game {
+    background-image: url("/assets/imgs/game-bg.jpg");
+    display: flex; /* This is necessary for the child wrapper to take height */
+}
+
+#myVideo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0; /* Behind content */
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+/* Main Layout Structure */
+.game-content-wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+}
+
+/* Top Bar */
+.bar {
+    flex-shrink: 0;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.bar-left, .bar-right {
+    flex: 1;
+}
+.bar-center {
+    flex-shrink: 0;
+}
+.bar-right {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+/* Middle Row */
+.radar-row {
+    flex-grow: 1;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    padding: 1rem 0;
+    width: 100%;
+}
+
+.antenna-detection-col,
+.prize-selection-col,
+.radar-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+}
+
+/* Bottom Bar */
+.button-row {
+    flex-shrink: 0;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.button-row > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-row .col-3:first-child {
+    justify-content: flex-start;
+}
+
+
+/* Content inside columns */
+.bar-container {
+    width: 60px;
+    height: 70%;
+    max-height: 300px;
+background-color: rgba(255,255,255,0.3);
+  border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: flex-end;
+}
+
+.fill-bar {
+    width: 100%;
+    background: linear-gradient(to top, #6bbace, #ff7676);
+    transition: height 0.5s ease-in-out;
+}
+
+.radar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#myVideo2 {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+#image-selector {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.selectable {
+    width: 80%;
+    height: auto;
+    max-height: 18%;
+    object-fit: contain;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: border 0.2s ease;
+}
+
+/* General Styles */
+.logo-nav {
+    width: 150px;
+    height: auto;
+}
+
+.menu-item {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.btn-custom {
+    border: none;
+    outline: none;
+    height: 48px;
+    color: black;
+    background: rgb(102, 175, 219);
+    font-size: 18px !important;
+    border-radius: 15px;
+    width: 60%;
+    min-width: 150px;
+    margin: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.btn-custom:hover {
+    filter: brightness(1.1);
+}
+
+.icon-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    color: #c2ccce;
+    text-align: center;
+}
+
+.icon-box-2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.icon-box-2.green {
+    background-color: #06ac06;
+     box-shadow:
+                0 0 5px 5px rgba(6, 172, 6, 0.2), /* Outer glow with opacity */
+                0 0 30px 15px rgba(6, 172, 6, 0.2); /* Even softer outer glow */
+}
+
+.btn-custom {
+  transition: background-color 5s ease; /* Adjust duration and timing function as needed */
+}
+
+.icon-box-2.red {
+    background: #ea3323;
+      box-shadow:
+                0 0 5px 5px rgba(234, 51, 35, 0.4); /* Outer glow with opacity */
+
+}
+
+.icon-box span {
+    font-size: 12px;
+}
+
+@media (max-width: 768px) { /* Tablet size */
+    .icon-box-2 {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) { /* Mobile size */
+    .icon-box-2 {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+
+/* Overlay and Modals */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+
+
+.antenna-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.antenna-icon {
+  width: 40px;
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .antenna-icon {
+    width: 50px;
+  }
+}
+
+
+
+
+.overlay-content {
+    color: white;
+    font-size: 24px;
+    padding: 20px 40px;
+    border-radius: 12px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+}
+
+/* Media Queries for fine-tuning */
+@media (max-width: 767px) {
+    .logo-nav {
+        width: 100px;
+    }
+    .menu-item {
+        width: 22px;
+        height: 22px;
+    }
+    .bar-container {
+        width: 40px;
+    }
+    .an {
+        width: 50px;
+    }
+    .button-row img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .btn-custom {
+        height: 40px;
+        font-size: 16px !important;
+        width: 80%;
+    }
+}
+
+@media (max-width: 576px) {
+    .radar-row {
+        padding: 0.5rem 0;
+    }
+    .logo-nav {
+        width: 90px;
+    }
+    .menu-item {
+        width: 20px;
+        height: 20px;
+    }
+    .bar-container {
+        width: 30px;
+    }
+    .an {
+        width: 40px;
+    }
+    .button-row img {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    .btn-custom {
+        height: 35px;
+        font-size: 14px !important;
+        width: 90%;
+    }
+    .icon-box span {
+        font-size: 10px;
+    }
+}
+
+
+
+@import './bootstrap.css';
+@font-face {
+    font-family: 'GE Flow';
+    src: url('../fonts/GEFlow/GE-Flow-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+:root {
+    --bs-body-font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bs-heading-color: #FFFFFF;
+}
+
+body, html {
+    margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; background-color: #000;
+}
+
+section {
+    height: 100svh; width: 100vw; position: relative; background-position: center; background-repeat: no-repeat; background-size: cover; overflow: hidden;
+}
+
+#game {
+    background-image: url("/assets/imgs/game-bg.jpg"); display: flex;
+}
+
+#myVideo {
+    position: absolute; top: 0; left: 0; z-index: 0; object-fit: cover; height: 100%; width: 100%;
+}
+
+.game-content-wrapper {
+    height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: space-between; position: relative; z-index: 1;
+}
+
+/* Overlays */
+.overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    backdrop-filter: blur(8px);
+    background-color: rgba(6, 33, 46, 0.8);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+
+.overlay-content {
+    width: 90%; max-width: 600px; max-height: 90vh;
+    display: flex; flex-direction: column; align-items: center;
+    color: white; overflow-y: auto;
+    padding: 20px;
+}
+.overlay-title {
+    font-weight: bold; text-transform: uppercase; margin-bottom: 2rem;
+}
+.overlay-subtitle {
+    font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 1rem;
+}
+
+/* Winners Section */
+.winners-container, .settings-container, .help-container {
+    width: 100%;
+    text-align: center;
+}
+.winner-card {
+    background-color: rgba(217, 217, 217, 0.9);
+    border-radius: 50px;
+    margin-bottom: 1rem;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 15px rgba(173, 216, 230, 0.5);
+}
+.winner-icon {
+    margin-right: 15px;
+}
+.winner-icon img {
+    width: 40px;
+    height: 40px;
+}
+.winner-details {
+    display: flex; flex-direction: column; align-items: flex-start;
+    color: #04333f;
+}
+.winner-name {
+    font-weight: bold; font-size: 1rem;
+}
+.winner-prize {
+    font-size: 0.8rem; text-transform: uppercase;
+}
+
+/* Settings Section */
+.settings-menu {
+    width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem;
+}
+.a-btn {
+    width: 100%; max-width: 350px;
+    padding: 15px;
+    border: none; border-radius: 50px;
+    font-size: 1.1rem; font-weight: bold;
+    cursor: pointer; transition: background-color 0.3s ease;
+}
+.a-btn-music-on {
+    background-color: #5aaefc; color: white; /* Blue for ON */
+}
+.a-btn-music-off {
+    background-color: #e26a6a; color: white; /* Red for OFF */
+}
+.a-btn-default {
+    background-color: #f2f2f2; color: #04333f;
+}
+
+.a-input {
+    width: 100%; max-width: 350px;
+    padding: 15px 25px;
+    border: none; border-radius: 50px;
+    background-color: rgba(217, 217, 217, 0.9);
+    color: #04333f;
+    font-size: 1rem; text-align: center;
+}
+.a-input::placeholder {
+    color: #04333f; opacity: 0.7;
+}
+
+/* Help Section */
+.help-container {
+    font-family: 'GE Flow', sans-serif; font-size: 1rem; line-height: 1.6;
+}
+.help-container h1, .help-container h2 {
+     font-family: var(--bs-body-font-family);
+}
+.help-container ol {
+    text-align: right; padding-right: 20px;
+}
+.help-container p {
+    margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767px) {
+    .overlay-content { max-width: 95%; padding: 15px; }
+    .a-btn, .a-input { max-width: 100%; }
+    .winner-name { font-size: 0.9rem; }
+    .winner-prize { font-size: 0.7rem; }
+    .help-container { font-size: 0.9rem; }
+}
+
+/* Other existing styles from your app.css file should remain below */
+.bar { flex-shrink: 0; padding: 10px 15px; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.bar-left, .bar-right { flex: 1; }
+.bar-center { flex-shrink: 0; }
+.bar-right { display: flex; justify-content: flex-end; gap: 15px; }
+.radar-row { flex-grow: 1; min-height: 0; display: flex; align-items: stretch; justify-content: space-between; padding: 1rem 0; width: 100%; }
+.antenna-detection-col, .prize-selection-col, .radar-col { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0 10px; }
+.button-row { flex-shrink: 0; padding: 10px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+/* ... etc */
+
+
+
+
+
+
+.cash-balance-container {
+    display: flex; /* Use flexbox for alignment */
+    flex-direction: column; /* Stack image and text vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically if container has height */
+    text-align: center; /* Ensure text itself is centered */
+    /* Add any padding/margin as needed */
+    position: relative; /* If you want to absolutely position the text relative to this container */
+}
+
+.wallet-balance-display {
+    color: white; /* A vibrant color that fits your theme */
+    font-size: 0.8em; /* Adjust size as needed */
+    margin-top: -15px; /* Adjust this value to move the text closer/further from the image.
+                          Negative margin can overlap. */
+
+
+    font-weight: lighter;
+    position: absolute; /* Allows precise positioning over the image if needed */
+    bottom: -9px; /* Adjust as needed, e.g., to place it at the bottom of the image area */
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally using transform */
+    width: 100px; /* Match the width of the image for alignment */
+    overflow: hidden; /* Hide overflow if text is too long */
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Add ellipsis if text overflows */
+}
+
+/* Consider media queries for responsiveness if sizes need to change significantly on different screens */
+@media (max-width: 768px) {
+    .wallet-balance-display {
+        font-size: 0.8em; /* Smaller font on smaller screens */
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#sign-in {
+    background-image: url("/assets/imgs/sign-in-bg.jpg"); /* Specific background for sign-in page */
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    display: flex; /* Ensure flex properties apply to the section */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    flex-direction: column; /* Stack children vertically */
+}
+
+/* Updated form container styles to match the image */
+.form-container {
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+    border-radius: 20px; /* Rounded corners */
+    padding: 30px; /* Internal padding */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Subtle shadow/glow */
+    backdrop-filter: blur(5px); /* Optional: add a slight blur effect */
+    -webkit-backdrop-filter: blur(5px); /* For Safari */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle white border */
+    max-width: 400px; /* Max width for desktop */
+    width: 90%; /* Fluid width for smaller screens */
+    margin: 20px auto; /* Center horizontally */
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Adjusted gap inside the form container */
+    align-items: center; /* Center contents inside the form container */
+}
+
+/* Updated styles for input fields to match the image */
+.form-control.custom-input {
+    background-color: rgba(0, 0, 0, 0.5); /* Darker semi-transparent background */
+    border: none; /* No border */
+    border-radius: 15px; /* Rounded corners */
+    color: white; /* White text */
+    padding: 15px 20px; /* Good vertical padding */
+    height: auto; /* Allow height to adjust based on padding */
+    font-size: 1.1em; /* Slightly larger font */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
+    width: 100%; /* Ensure inputs take full width */
+}
+
+.form-control.custom-input::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Lighter placeholder color */
+    opacity: 1; /* Ensure placeholder is visible */
+}
+
+.form-control.custom-input:focus {
+    background-color: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25); /* Focus glow */
+    border-color: transparent; /* No border on focus */
+}
+
+/* Updated styles for custom buttons to match the image */
+.btn-custom {
+    border-radius: 15px; /* Rounded corners */
+    padding: 12px 25px; /* Good padding */
+    font-size: 1.1em;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.42), 0 6px 20px 0 rgba(0, 0, 0, 0.84); /* Shadow */
+    transition: all 0.3s ease; /* Smooth transitions */
+    border: none; /* No default border */
+    flex: 1; /* Allow buttons to grow and shrink in flex container */
+    min-width: 120px; /* Ensure a minimum width for buttons */
+}
+
+.btn-custom:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.6), 0 8px 25px 0 rgba(0, 0, 0, 0.9);
+}
+
+/* New: Red gradient for Sign Up button */
+.btn-custom-red {
+    background: linear-gradient(145deg, #e74c3c, #c0392b); /* Red gradient */
+    color: white;
+}
+
+/* New: Blue gradient for Sign In button */
+.btn-custom-blue {
+    background: linear-gradient(145deg, #3498db, #2980b9); /* Blue gradient */
+    color: white;
+}
+
+
+/* Adjustments for the flag and overall layout */
+#sign-in > .d-flex.align-items-center.flex-column.h-100 {
+    /* This targets the inner div within #sign-in to ensure proper centering */
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    width: 100%; /* Ensure it takes full width */
+    height: 100%; /* Ensure it takes full height */
+}
+
+.flag {
+    width: 100px; /* Adjust flag size */
+    height: auto;
+    margin-bottom: 30px; /* Space between flag and form */
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); /* Subtle glow for flag */
+    border-radius: 10px; /* Slightly rounded corners for flag */
+}
+
+/* Forgot Password text styling */
+.forgot-password-text {
+    color: white;
+    font-weight: normal;
+    text-shadow: #000 1px 0 10px;
+    font-size: 1em; /* Adjust size if needed */
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .form-container {
+        padding: 20px; /* Smaller padding on small screens */
+        width: 95%; /* More width on very small screens */
+    }
+    .flag {
+        width: 80px; /* Smaller flag on small screens */
+        margin-bottom: 20px;
+    }
+    .btn-custom {
+        font-size: 1em; /* Smaller font for buttons */
+        padding: 10px 15px; /* Adjusted padding for smaller buttons */
+        min-width: unset; /* Remove min-width on very small screens if it causes overflow */
+    }
+    .form-control.custom-input {
+        font-size: 1em;
+        padding: 12px 15px;
+    }
+}
+
+
+/* Existing wallet display styles (keeping them as is) */
+.wallet-image-container {
+    display: flex;
+    flex-direction: column; /* Stack image and text vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically if container has height */
+    text-align: center; /* Ensure text itself is centered */
+    position: relative; /* If you want to absolutely position the text relative to this container */
+}
+
+.wallet-balance-display {
+    color: white; /* A vibrant color that fits your theme */
+    font-size: 0.8em; /* Adjust size as needed */
+    margin-top: -15px; /* Adjust this value to move the text closer/further from the image.
+                          Negative margin can overlap. */
+    font-weight: lighter;
+    position: absolute; /* Allows precise positioning over the image if needed */
+    bottom: -9px; /* Adjust as needed, e.g., to place it at the bottom of the image area */
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally using transform */
+    width: 100px; /* Match the width of the image for alignment */
+    overflow: hidden; /* Hide overflow if text is too long */
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Add ellipsis if text overflows */
+}
+
+/* Consider media queries for responsiveness if sizes need to change significantly on different screens */
+@media (max-width: 768px) {
+    .wallet-balance-display {
+        font-size: 0.8em; /* Smaller font on smaller screens */
+    }
+}
