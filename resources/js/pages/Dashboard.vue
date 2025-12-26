@@ -188,17 +188,17 @@
                             <div class="prize-item">
                                 <img class="selectable" src="/assets/imgs/suv1.png" data-detected="/assets/imgs/suv-detected1.png" />
                                 <div class="prize-label">SUV</div>
-                                <div class="prize-price">200.000$</div>
-                            </div>
-                            <div class="prize-item">
-                                <img class="selectable" src="/assets/imgs/super-car1.png" data-detected="/assets/imgs/super-car-detected1.png" />
-                                <div class="prize-label">SUPER CAR</div>
-                                <div class="prize-price">200.000$</div>
+                                <div class="prize-price">50.000$</div>
                             </div>
                             <div class="prize-item">
                                 <img class="selectable" src="/assets/imgs/muscle-car1.png" data-detected="/assets/imgs/muscle-car-detected1.png" />
                                 <div class="prize-label">MUSCLE CAR</div>
                                 <div class="prize-price">150.000$</div>
+                            </div>
+                            <div class="prize-item">
+                                <img class="selectable" src="/assets/imgs/super-car1.png" data-detected="/assets/imgs/super-car-detected1.png" />
+                                <div class="prize-label">SUPER CAR</div>
+                                <div class="prize-price">200.000$</div>
                             </div>
                         </div>
                     </div>
@@ -360,6 +360,7 @@ async function startScan() {
 
     const scanSound = document.getElementById('scanSound');
     if (scanSound && audioEnabled.value) {
+        scanSound.loop = true;
         scanSound.play();
     }
 
@@ -373,7 +374,16 @@ async function startScan() {
         setTimeout(() => {
             radarVideo.value.pause();
             radarVideo.value.currentTime = 0;
-        }, 10000);
+        }, 16000);
+    }
+    
+    // Stop scan sound after scan duration
+    if (scanSound && audioEnabled.value) {
+        setTimeout(() => {
+            scanSound.pause();
+            scanSound.currentTime = 0;
+            scanSound.loop = false;
+        }, 16000);
     }
 
     let found = false;
@@ -388,7 +398,7 @@ async function startScan() {
     }
 
     const total = originalColors.length;
-    const totalMs = 8000;
+    const totalMs = 16000;
     const interval = totalMs / total;
 
     for (let i = 1; i <= total; i++) {

@@ -96,8 +96,17 @@ const submit = () => {
 
                     <!-- Horizontal rule with shadow -->
                     <hr style="height:2px;border-width:0;color:gray;background-color:white;opacity:1; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.42), 0 6px 20px 0 rgba(0, 0, 0, 0.84); width: 80%; margin: 20px auto;">
-                    <!-- Forgot Password text (using defined CSS class) -->
-                    <h4 class="forgot-password-text">Forgot Password?</h4>
+                    <!-- Forgot Password button -->
+                    <div class="d-flex justify-content-center mt-3 w-100">
+                        <a
+                            href="/forgot-password"
+                            class="btn btn-custom-1 btn-custom"
+                            style="background-color:rgb(102, 175, 219); color: white;"
+                            :tabindex="6"
+                        >
+                            Forgot Password?
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>

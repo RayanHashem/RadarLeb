@@ -49,12 +49,20 @@ if ('serviceWorker' in navigator) {
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue', { eager: false })),
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .use(ZiggyVue)
-            .mount(el);
+        const app = createApp({ render: () => h(App, props) });
+        
+        // Configure Ziggy - use from window (set by @routes) or from Inertia props
+        const ziggyConfig = (window as any).Ziggy || props.initialPage?.props?.ziggy;
+        app.use(plugin);
+        if (ziggyConfig) {
+            app.use(ZiggyVue, ziggyConfig);
+        } else {
+            app.use(ZiggyVue);
+        }
+        
+        app.mount(el);
     },
     progress: {
         color: '#4B5563',

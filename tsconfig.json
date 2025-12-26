@@ -123,5 +123,11 @@
         "resources/js/**/*.tsx", 
         "resources/js/**/*.vue",
         "ziggy.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "vendor",
+        "storage",
+        "bootstrap/cache"
     ]
 }

@@ -105,7 +105,7 @@ const submit = () => {
                             as="button"
                             :href="route('login')"
                             class="btn btn-custom-2 btn-custom"
-                            :tabindex="5"
+                            :tabindex="7"
                             style="background-color:rgb(102, 175, 219);"
                         >
                             Sign in
