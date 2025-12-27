@@ -273,6 +273,14 @@ background-color: rgba(255,255,255,0.3);
     flex-shrink: 0;
 }
 
+.antenna-label {
+    color: #ffffff;
+    font-size: 0.65em;
+    text-align: center;
+    margin-bottom: 14px;
+    line-height: 1.1;
+}
+
 .prize-price {
     color: #ffffff;
     font-size: 0.6em;
@@ -321,7 +329,7 @@ background-color: rgba(255,255,255,0.3);
     border: none;
     outline: none;
     height: 48px;
-    color: black;
+    color: white !important;
     background: rgb(102, 175, 219);
     font-size: 18px !important;
     border-radius: 15px;
@@ -329,6 +337,7 @@ background-color: rgba(255,255,255,0.3);
     min-width: 150px;
     margin: 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    white-space: nowrap; /* Prevent text from wrapping to multiple lines */
 }
 
 .btn-custom:hover {
@@ -550,6 +559,12 @@ section {
     font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 1rem;
 }
 
+.ltr-inline {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+}
+
 /* Winners Section */
 .winners-container, .settings-container, .help-container {
     width: 100%;
@@ -614,6 +629,10 @@ section {
 .a-input::placeholder {
     color: #04333f; opacity: 0.7;
 }
+.a-input.error {
+    border: 2px solid #e4787e;
+    background-color: rgba(228, 120, 126, 0.2);
+}
 
 /* Help Section */
 .help-container {
@@ -675,10 +694,7 @@ section {
     bottom: -9px; /* Adjust as needed, e.g., to place it at the bottom of the image area */
     left: 50%;
     transform: translateX(-50%); /* Center horizontally using transform */
-    width: 100px; /* Match the width of the image for alignment */
-    overflow: hidden; /* Hide overflow if text is too long */
-    white-space: nowrap; /* Prevent text from wrapping */
-    text-overflow: ellipsis; /* Add ellipsis if text overflows */
+    white-space: nowrap; /* Keep text on one line */
 }
 
 /* Consider media queries for responsiveness if sizes need to change significantly on different screens */
@@ -745,13 +761,9 @@ section {
 
 /* Updated form container styles to match the image */
 .form-container {
-    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+    background-color: transparent; /* Remove black box background */
     border-radius: 20px; /* Rounded corners */
     padding: 30px; /* Internal padding */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Subtle shadow/glow */
-    backdrop-filter: blur(5px); /* Optional: add a slight blur effect */
-    -webkit-backdrop-filter: blur(5px); /* For Safari */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle white border */
     max-width: 400px; /* Max width for desktop */
     width: 90%; /* Fluid width for smaller screens */
     margin: 20px auto; /* Center horizontally */
@@ -795,11 +807,22 @@ section {
     border: none; /* No default border */
     flex: 1; /* Allow buttons to grow and shrink in flex container */
     min-width: 120px; /* Ensure a minimum width for buttons */
+    color: white !important; /* White text color for all buttons */
+    white-space: nowrap; /* Prevent text from wrapping to multiple lines */
 }
 
 .btn-custom:hover {
     transform: translateY(-2px); /* Slight lift on hover */
-    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.6), 0 8px 25px 0 rgba(0, 0, 0, 0.9);
+}
+
+/* Blue highlight for Sign In button (btn-custom-1) */
+.btn-custom-1:hover {
+    box-shadow: 0 6px 12px 0 rgba(102, 175, 219, 0.6), 0 8px 25px 0 rgba(102, 175, 219, 0.9);
+}
+
+/* Red highlight for Sign Up button (btn-custom-2) */
+.btn-custom-2:hover {
+    box-shadow: 0 6px 12px 0 rgba(228, 120, 126, 0.6), 0 8px 25px 0 rgba(228, 120, 126, 0.9);
 }
 
 /* New: Red gradient for Sign Up button */
@@ -859,6 +882,7 @@ section {
         font-size: 1em; /* Smaller font for buttons */
         padding: 10px 15px; /* Adjusted padding for smaller buttons */
         min-width: unset; /* Remove min-width on very small screens if it causes overflow */
+        white-space: nowrap; /* Prevent text from wrapping to multiple lines */
     }
     .form-control.custom-input {
         font-size: 1em;
@@ -887,10 +911,7 @@ section {
     bottom: -9px; /* Adjust as needed, e.g., to place it at the bottom of the image area */
     left: 50%;
     transform: translateX(-50%); /* Center horizontally using transform */
-    width: 100px; /* Match the width of the image for alignment */
-    overflow: hidden; /* Hide overflow if text is too long */
-    white-space: nowrap; /* Prevent text from wrapping */
-    text-overflow: ellipsis; /* Add ellipsis if text overflows */
+    white-space: nowrap; /* Keep text on one line */
 }
 
 /* Consider media queries for responsiveness if sizes need to change significantly on different screens */

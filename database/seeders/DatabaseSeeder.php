@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -18,7 +19,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'phone_number' => '12341234',
-            'password' => '1234'
+            'password' => Hash::make(env('SEEDER_PASSWORD', 'password'))
         ]);
 
         $this->call([GameSeeder::class]);

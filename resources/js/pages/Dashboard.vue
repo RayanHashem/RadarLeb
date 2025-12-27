@@ -14,7 +14,7 @@
                         <p dir="rtl">
                             هي لعبة ممتعة تجمع بين الاستراتيجيةوالحظ. الهدف الرئيسي من اللعبة هو قيام اللاعبين بمسح من عدة مناطق على طول الأراضي اللبنانية وجمع الهوائيات باستخدام واجهة رادار. كل عملية مسح ناجحة تضيف إلى عداد الهوائيات الخاص باللاعب. عند اكتشاف ستة هوائيات نشطة, يفوز اللاعب بعد اختياره من مجموعة متنوعة من الجوائز القيمة, بما في ذلك الهواتف المحموله, الإلكترونيات, الدراجات النارية, سيارات الدفع الرباعي والسيارات الخارقة.
                         </p>
-                        <h2 class="overlay-subtitle">كيفية المشاركة ولعب RADAR LEB</h2>
+                        <h2 class="overlay-subtitle" dir="rtl">كيفية المشاركة ولعب <span class="ltr-inline">RADAR LEB</span></h2>
                         <ol dir="rtl">
                             <li>قم بتحميل تطبيق WISH OR OMT OR SUYOOLعلى هاتفك او خدمة DOOR TO DOOR PICK UP CASH</li>
                             <li>اشحن محفظتك بالدولار بالمبلغ الأدنى المذكور في النص أدناه, ثم قم بتحويل المبلغ إلى الرقم 71484833 وأكد التحويل عبر خدمة الواتساب مع إضافة اسمك الكامل ورقم الهاتف ومبلغ الحد الأدنى المطلوب لكل جائزة ب ال NOTE OR REASON</li>
@@ -71,6 +71,9 @@
                 <template v-else-if="activeOverlay === 'settings'">
                     <div class="settings-container">
                         <h1 class="overlay-title">SETTINGS</h1>
+                        <div v-if="showSuccessMessage" class="success-message" style="background-color: #5DB0A1; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                            Password changed successfully
+                        </div>
                         <div v-if="currentPage === 'settings'" class="settings-menu">
                             <!-- Button class updated to reflect musicOn state -->
                             <button :class="audioEnabled ? 'a-btn a-btn-music-on' : 'a-btn a-btn-music-off'" @click="toggleMusic">
@@ -83,12 +86,86 @@
                         </div>
 
                         <div v-else-if="currentPage === 'password'" class="settings-menu">
-                            <h2 class="overlay-subtitle">Change Your Password!</h2>
-                            <input type="password" placeholder="Confirm Your Password!" v-model="newPassword" class="a-input" />
-                            <input type="password" placeholder="Confirm Your Password!" v-model="confirmPassword" class="a-input" />
-                            <button class="a-btn a-btn-music-on" @click="currentPage = 'settings'">
-                                Done
-                            </button>
+                            <!-- Step A: Verify old password -->
+                            <div v-if="!oldPasswordVerified">
+                                <h2 class="overlay-subtitle">Change Your Password</h2>
+                                <input 
+                                    type="password" 
+                                    placeholder="Enter old password" 
+                                    v-model="oldPassword" 
+                                    class="a-input"
+                                    :class="{ 'error': passwordError }"
+                                />
+                                <div v-if="passwordError" class="error-message" style="color: #e4787e; margin-top: 10px; font-size: 0.9em;">
+                                    {{ passwordError }}
+                                </div>
+                                <div v-if="wrongAttempts >= 3" class="mt-3">
+                                    <Link
+                                        as="button"
+                                        type="button"
+                                        href="/forgot-password"
+                                        class="a-btn a-btn-default"
+                                        style="width: 100%;"
+                                    >
+                                        Forgot Password?
+                                    </Link>
+                                </div>
+                                <button 
+                                    class="a-btn a-btn-music-on mt-3" 
+                                    @click="verifyOldPassword"
+                                    :disabled="!oldPassword || verifyingPassword"
+                                    style="width: 100%;"
+                                >
+                                    {{ verifyingPassword ? 'Verifying...' : 'Continue' }}
+                                </button>
+                                <button 
+                                    class="a-btn a-btn-default mt-2" 
+                                    @click="resetPasswordFlow"
+                                    style="width: 100%;"
+                                >
+                                    Back
+                                </button>
+                            </div>
+
+                            <!-- Step B: Enter new password -->
+                            <div v-else>
+                                <h2 class="overlay-subtitle">Enter New Password</h2>
+                                <input 
+                                    type="password" 
+                                    placeholder="Enter new password" 
+                                    v-model="newPassword" 
+                                    class="a-input"
+                                    :class="{ 'error': newPasswordError }"
+                                />
+                                <div v-if="newPasswordError" class="error-message" style="color: #e4787e; margin-top: 10px; font-size: 0.9em;">
+                                    {{ newPasswordError }}
+                                </div>
+                                <input 
+                                    type="password" 
+                                    placeholder="Confirm new password" 
+                                    v-model="confirmPassword" 
+                                    class="a-input mt-3"
+                                    :class="{ 'error': confirmPasswordError }"
+                                />
+                                <div v-if="confirmPasswordError" class="error-message" style="color: #e4787e; margin-top: 10px; font-size: 0.9em;">
+                                    {{ confirmPasswordError }}
+                                </div>
+                                <button 
+                                    class="a-btn a-btn-music-on mt-3" 
+                                    @click="updatePassword"
+                                    :disabled="!newPassword || !confirmPassword || updatingPassword"
+                                    style="width: 100%;"
+                                >
+                                    {{ updatingPassword ? 'Updating...' : 'Done' }}
+                                </button>
+                                <button 
+                                    class="a-btn a-btn-default mt-2" 
+                                    @click="resetPasswordFlow"
+                                    style="width: 100%;"
+                                >
+                                    Back
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -152,10 +229,10 @@
                     <div class="col-3 antenna-detection-col">
                         <div class="icon-box">
                               <img :src="antennaIconSrc" class="an" style="width: 100px;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
   max-width: 100%;
 "/>
-
+                              <div class="antenna-label">ANTENNA DETECTION</div>
                         </div>
                         <div class="bar-container">
                             <div class="fill-bar" :style="{ height: (visibleCount / originalColors.length) * 100 + '%' }"></div>
@@ -213,7 +290,7 @@
                 <div class="antenna-container">
                     <div v-for="n in 6" :key="n">
                         <img
-                            :src="n <= currentProgress.radar_level ? '/assets/imgs/enable.png' : '/assets/imgs/antenna.png'"
+                            :src="n <= currentProgress.radar_level ? '/assets/imgs/enable1.png' : '/assets/imgs/enable.png'"
                             class="antenna-icon"
                         />
                     </div>
@@ -226,7 +303,7 @@
 
                 <div class="button-row">
                      <div class="col-3 cash-balance-container"> <img style="width:100px; height:100px" src="/assets/imgs/radar-cash.png">
-            <span class="wallet-balance-display">CASH {{ walletBalance }}</span> </div>
+            <span class="wallet-balance-display">RADAR CASH {{ walletBalance }}</span> </div>
                     <div class="col-6">
 
 
@@ -237,17 +314,19 @@
                             {{ buttonText }}
                         </button>
                     </div>
-                    <div class="col-3">
-                        <a :href="locationUrl" target="_blank" @click="getUserLocation">
-                            <img style="width:100px; height:100px" src="/assets/imgs/my-location.png">
+                    <div class="col-3 location-container">
+                        <a :href="locationUrl" target="_blank" @click="getUserLocation" style="display: flex; justify-content: center; align-items: center;">
+                            <img style="width:100px; height:auto; object-fit: contain;" src="/assets/imgs/my-location.png">
                         </a>
+                        <span class="location-label">MY LOCATION</span>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <audio id="scanSound" src="/assets/imgs/radar.mp3" preload="auto"></audio>
+    <audio id="scanSound" src="/assets/imgs/audio/radar.mp3" preload="auto"></audio>
+    <audio id="scanSound2" src="/assets/imgs/audio/radar2.mp3" preload="auto"></audio>
     <audio id="hornSound" src="/assets/imgs/horn.mp3" preload="auto"></audio>
     <audio id="clickSound" src="/assets/imgs/click.mp3" preload="auto"></audio>
 
@@ -255,7 +334,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, nextTick, onUnmounted } from 'vue';
 import axios from 'axios';
-import { router } from '@inertiajs/vue3';
+import { router, Link } from '@inertiajs/vue3';
 
 const activeOverlay = ref(null);
 
@@ -287,8 +366,17 @@ const originalColors = [
 
 const currentPage = ref('settings');
 const audioEnabled = ref(true);
+const oldPassword = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
+const oldPasswordVerified = ref(false);
+const wrongAttempts = ref(0);
+const passwordError = ref('');
+const newPasswordError = ref('');
+const confirmPasswordError = ref('');
+const verifyingPassword = ref(false);
+const updatingPassword = ref(false);
+const showSuccessMessage = ref(false);
 const help = ref(false);
 const userLocation = ref({ lat: null, lng: null });
 const locationUrl = ref('https://www.google.com/maps?q=33.8938,35.5018'); // Default fallback location
@@ -355,14 +443,35 @@ const playClickSound = () => {
     }
 };
 
+function playScanSoundSequence() {
+  if (!audioEnabled.value) return;
+
+  const a1 = document.getElementById('scanSound');
+  const a2 = document.getElementById('scanSound2');
+  
+  if (!a1 || !a2) return;
+
+  // Reset both audio elements to prevent overlap
+  [a1, a2].forEach(a => {
+    a.loop = false;
+    a.pause();
+    a.currentTime = 0;
+  });
+
+  // When radar.mp3 ends, play radar2.mp3
+  a1.addEventListener('ended', () => {
+    a2.currentTime = 0;
+    a2.play().catch(console.error);
+  }, { once: true });
+
+  // Start playing radar.mp3
+  a1.play().catch(console.error);
+}
+
 async function startScan() {
     if (scanning.value) return;
 
-    const scanSound = document.getElementById('scanSound');
-    if (scanSound && audioEnabled.value) {
-        scanSound.loop = true;
-        scanSound.play();
-    }
+    playScanSoundSequence();
 
     scanning.value = true;
     detectionStatus.value = 'searching';
@@ -374,15 +483,6 @@ async function startScan() {
         setTimeout(() => {
             radarVideo.value.pause();
             radarVideo.value.currentTime = 0;
-        }, 16000);
-    }
-    
-    // Stop scan sound after scan duration
-    if (scanSound && audioEnabled.value) {
-        setTimeout(() => {
-            scanSound.pause();
-            scanSound.currentTime = 0;
-            scanSound.loop = false;
         }, 16000);
     }
 
@@ -459,6 +559,124 @@ const toggleMusic = () => {
 
 const handleLogout = () => {
     router.post('/logout');
+};
+
+const resetPasswordFlow = () => {
+    oldPassword.value = '';
+    newPassword.value = '';
+    confirmPassword.value = '';
+    oldPasswordVerified.value = false;
+    wrongAttempts.value = 0;
+    passwordError.value = '';
+    newPasswordError.value = '';
+    confirmPasswordError.value = '';
+    currentPage.value = 'settings';
+};
+
+const verifyOldPassword = async () => {
+    if (!oldPassword.value) {
+        passwordError.value = 'Please enter your old password';
+        return;
+    }
+
+    verifyingPassword.value = true;
+    passwordError.value = '';
+
+    try {
+        const response = await axios.post('/settings/password/verify', {
+            old_password: oldPassword.value
+        });
+
+        if (response.data.verified) {
+            oldPasswordVerified.value = true;
+            wrongAttempts.value = 0;
+            passwordError.value = '';
+        } else {
+            wrongAttempts.value++;
+            if (wrongAttempts.value >= 3) {
+                passwordError.value = 'Too many incorrect attempts. Please use "Forgot Password?" to reset.';
+            } else {
+                passwordError.value = `Incorrect password. ${3 - wrongAttempts.value} attempts remaining.`;
+            }
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            passwordError.value = error.response.data.message;
+        } else {
+            passwordError.value = 'An error occurred. Please try again.';
+        }
+        wrongAttempts.value++;
+        if (wrongAttempts.value >= 3) {
+            passwordError.value = 'Too many incorrect attempts. Please use "Forgot Password?" to reset.';
+        }
+    } finally {
+        verifyingPassword.value = false;
+    }
+};
+
+const updatePassword = async () => {
+    // Clear previous errors
+    newPasswordError.value = '';
+    confirmPasswordError.value = '';
+
+    // Validation
+    if (!newPassword.value) {
+        newPasswordError.value = 'Please enter a new password';
+        return;
+    }
+
+    if (newPassword.value.length < 8) {
+        newPasswordError.value = 'Password must be at least 8 characters';
+        return;
+    }
+
+    if (!confirmPassword.value) {
+        confirmPasswordError.value = 'Please confirm your new password';
+        return;
+    }
+
+    if (newPassword.value !== confirmPassword.value) {
+        confirmPasswordError.value = 'Passwords do not match';
+        return;
+    }
+
+    updatingPassword.value = true;
+
+    try {
+        const response = await axios.post('/settings/password', {
+            old_password: oldPassword.value,
+            new_password: newPassword.value,
+            new_password_confirmation: confirmPassword.value
+        });
+
+        // Show success message
+        showSuccessMessage.value = true;
+        
+        // Reset form and return to settings after 2 seconds
+        setTimeout(() => {
+            resetPasswordFlow();
+            showSuccessMessage.value = false;
+        }, 2000);
+    } catch (error) {
+        if (error.response?.data?.errors) {
+            const errors = error.response.data.errors;
+            if (errors.new_password) {
+                newPasswordError.value = errors.new_password[0];
+            }
+            if (errors.new_password_confirmation) {
+                confirmPasswordError.value = errors.new_password_confirmation[0];
+            }
+            if (errors.old_password) {
+                passwordError.value = errors.old_password[0];
+            }
+        } else if (error.response?.data?.message) {
+            passwordError.value = error.response.data.message;
+        } else {
+            passwordError.value = 'An error occurred. Please try again.';
+        }
+    } finally {
+        updatingPassword.value = false;
+    }
 };
 
 const getUserLocation = (event) => {
@@ -544,6 +762,45 @@ onMounted(() => {
     fetchRadarStatus();
     setInterval(fetchRadarStatus, 5_000);
 
+    // Scan audio sequence is handled by playScanSoundSequence() function
+    
+    // Add error listeners to DOM audio element for debugging
+    const a2 = document.getElementById('scanSound2');
+    if (a2) {
+        a2.addEventListener('error', () => {
+            console.error('scanSound2 DOM element error:', a2.error, a2.src, {
+                readyState: a2.readyState,
+                networkState: a2.networkState,
+                duration: a2.duration
+            });
+        }, { once: false });
+        
+        a2.addEventListener('loadedmetadata', () => {
+            console.log('scanSound2 loadedmetadata:', {
+                src: a2.src,
+                readyState: a2.readyState,
+                duration: a2.duration,
+                networkState: a2.networkState
+            });
+        }, { once: false });
+        
+        a2.addEventListener('canplaythrough', () => {
+            console.log('scanSound2 canplaythrough:', {
+                src: a2.src,
+                readyState: a2.readyState,
+                duration: a2.duration
+            });
+        }, { once: false });
+        
+        // Log initial state
+        console.log('scanSound2 initial state:', {
+            src: a2.src,
+            readyState: a2.readyState,
+            networkState: a2.networkState,
+            duration: a2.duration
+        });
+    }
+
     const video = document.getElementById('myVideo');
         video?.play().catch((e) => {
             console.warn('Autoplay failed:', e);
@@ -569,7 +826,7 @@ onMounted(() => {
             hornInterval = setInterval(playHornSound, 180000);
         }
 
-    }, 1000);
+    }, 2000);
 
     const prizeItems = document.querySelectorAll('#image-selector .prize-item');
     prizeItems.forEach((item, index) => {
@@ -697,7 +954,7 @@ watch(selectedGameId, updatePrizeSelectionUI);
     stroke: url(#loaderGradient); /* Reference the gradient defined in SVG */
     stroke-width: 8;
     stroke-linecap: round;
-    animation: load-progress 20s linear forwards; /* 20 seconds animation */
+    animation: load-progress 2s linear forwards; /* 2 seconds animation */
     stroke-dasharray: 282.7; /* 2 * PI * 45 (radius) */
     stroke-dashoffset: 282.7; /* Start fully hidden */
     filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.7)) drop-shadow(0 0 5px rgba(0, 255, 255, 0.5)); /* Neon glow effect */
@@ -796,6 +1053,21 @@ watch(selectedGameId, updatePrizeSelectionUI);
 .btn-logout svg {
     width: 100%;
     height: 100%;
+}
+
+.location-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.location-label {
+    color: white;
+    font-size: 0.8em;
+    margin-top: 12px;
+    text-align: center;
 }
 
 </style>

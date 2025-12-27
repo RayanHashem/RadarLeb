@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/me',           fn (Request $r) => $r->user()->only('id','game_id'));
     Route::post('/me/game',     [\App\Http\Controllers\Api\UserController::class,'updateGame']);
+
+    // Settings routes
+    Route::post('/settings/password/verify', [SettingsController::class, 'verifyOldPassword']);
+    Route::post('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
