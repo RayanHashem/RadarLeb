@@ -52,7 +52,7 @@ const submit = () => {
                         autocomplete="username"
                         v-model="form.phone_number"
                     />
-                    <InputError :message="form.errors.phone_number" />
+                    <InputError :message="form.errors.phone_number" variant="material" />
 
                     <!-- Password Input -->
                     <input
@@ -65,7 +65,7 @@ const submit = () => {
                         autocomplete="current-password"
                         v-model="form.password"
                     />
-                    <InputError :message="form.errors.password" />
+                    <InputError :message="form.errors.password" variant="material" />
 
                     <!-- Buttons and Forgot Password link, centered -->
                     <!-- Changed from flex-column to flex-row for side-by-side buttons -->

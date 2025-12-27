@@ -40,7 +40,7 @@ const submit = () => {
                         autocomplete="name"
                         type="text"
                     />
-                    <InputError :message="form.errors.name" />
+                    <InputError :message="form.errors.name" variant="material" />
 
                     <!-- Email Input -->
                     <input
@@ -53,7 +53,7 @@ const submit = () => {
                         autocomplete="email"
                         type="email"
                     />
-                    <InputError :message="form.errors.email" />
+                    <InputError :message="form.errors.email" variant="material" />
 
                     <!-- Phone Number Input -->
                     <input
@@ -66,7 +66,7 @@ const submit = () => {
                         autocomplete="tel"
                         type="tel"
                     />
-                    <InputError :message="form.errors.phone_number" />
+                    <InputError :message="form.errors.phone_number" variant="material" />
 
                     <!-- Password Input -->
                     <input
@@ -79,7 +79,7 @@ const submit = () => {
                         autocomplete="new-password"
                         type="password"
                     />
-                    <InputError :message="form.errors.password" />
+                    <InputError :message="form.errors.password" variant="material" />
 
                     <!-- Confirm Password Input -->
                     <input

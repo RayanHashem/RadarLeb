@@ -96,8 +96,9 @@
                                     class="a-input"
                                     :class="{ 'error': passwordError }"
                                 />
-                                <div v-if="passwordError" class="error-message" style="color: #e4787e; margin-top: 10px; font-size: 0.9em;">
-                                    {{ passwordError }}
+                                <div v-if="passwordError" class="error-message" style="color: #ef4444; margin-top: 10px; font-size: 0.9em; display: flex; align-items: flex-start; gap: 8px;">
+                                    <span style="font-size: 16px; flex-shrink: 0; margin-top: 2px;">⚠️</span>
+                                    <span>{{ passwordError }}</span>
                                 </div>
                                 <div v-if="wrongAttempts >= 3" class="mt-3">
                                     <Link
@@ -137,8 +138,9 @@
                                     class="a-input"
                                     :class="{ 'error': newPasswordError }"
                                 />
-                                <div v-if="newPasswordError" class="error-message" style="color: #e4787e; margin-top: 10px; font-size: 0.9em;">
-                                    {{ newPasswordError }}
+                                <div v-if="newPasswordError" class="error-message" style="color: #ef4444; margin-top: 10px; font-size: 0.9em; display: flex; align-items: flex-start; gap: 8px;">
+                                    <span style="font-size: 16px; flex-shrink: 0; margin-top: 2px;">⚠️</span>
+                                    <span>{{ newPasswordError }}</span>
                                 </div>
                                 <input 
                                     type="password" 
@@ -147,8 +149,9 @@
                                     class="a-input mt-3"
                                     :class="{ 'error': confirmPasswordError }"
                                 />
-                                <div v-if="confirmPasswordError" class="error-message" style="color: #e4787e; margin-top: 10px; font-size: 0.9em;">
-                                    {{ confirmPasswordError }}
+                                <div v-if="confirmPasswordError" class="error-message" style="color: #ef4444; margin-top: 10px; font-size: 0.9em; display: flex; align-items: flex-start; gap: 8px;">
+                                    <span style="font-size: 16px; flex-shrink: 0; margin-top: 2px;">⚠️</span>
+                                    <span>{{ confirmPasswordError }}</span>
                                 </div>
                                 <button 
                                     class="a-btn a-btn-music-on mt-3" 
@@ -290,7 +293,7 @@
                 <div class="antenna-container">
                     <div v-for="n in 6" :key="n">
                         <img
-                            :src="n <= currentProgress.radar_level ? '/assets/imgs/enable1.png' : '/assets/imgs/enable.png'"
+                            :src="(n === 1 ? currentProgress.radar_level >= 2 : n <= currentProgress.radar_level) ? '/assets/imgs/enable1.png' : '/assets/imgs/enable.png'"
                             class="antenna-icon"
                         />
                     </div>

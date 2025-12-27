@@ -39,7 +39,7 @@ const submit = () => {
                 <div class="grid gap-2">
                     <Label for="email">Email</Label>
                     <Input id="email" type="email" name="email" autocomplete="email" v-model="form.email" class="mt-1 block w-full" readonly />
-                    <InputError :message="form.errors.email" class="mt-2" />
+                    <InputError :message="form.errors.email" variant="material" class="mt-2" />
                 </div>
 
                 <div class="grid gap-2">
@@ -54,7 +54,7 @@ const submit = () => {
                         autofocus
                         placeholder="Password"
                     />
-                    <InputError :message="form.errors.password" />
+                    <InputError :message="form.errors.password" variant="material" />
                 </div>
 
                 <div class="grid gap-2">
@@ -68,7 +68,7 @@ const submit = () => {
                         class="mt-1 block w-full"
                         placeholder="Confirm password"
                     />
-                    <InputError :message="form.errors.password_confirmation" />
+                    <InputError :message="form.errors.password_confirmation" variant="material" />
                 </div>
 
                 <Button type="submit" class="mt-4 w-full" :disabled="form.processing">

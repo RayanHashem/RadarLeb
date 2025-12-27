@@ -43,7 +43,7 @@ const submit = () => {
                         autocomplete="email"
                         v-model="form.email"
                     />
-                    <InputError :message="form.errors.email" />
+                    <InputError :message="form.errors.email" variant="material" />
 
                     <!-- Submit Button -->
                     <div class="d-flex justify-content-center align-items-center gap-3 mt-4 w-100">
