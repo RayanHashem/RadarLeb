@@ -97,6 +97,21 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'analytics_pg' => [
+            'driver' => 'pgsql',
+            'url' => env('ANALYTICS_DB_URL'),
+            'host' => env('ANALYTICS_DB_HOST'),
+            'port' => env('ANALYTICS_DB_PORT', '5432'),
+            'database' => env('ANALYTICS_DB_DATABASE'),
+            'username' => env('ANALYTICS_DB_USERNAME'),
+            'password' => env('ANALYTICS_DB_PASSWORD'),
+            'charset' => env('ANALYTICS_DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('ANALYTICS_DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

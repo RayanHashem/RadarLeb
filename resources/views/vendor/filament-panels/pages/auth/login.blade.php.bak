@@ -1,0 +1,186 @@
+@push('styles')
+<style>
+    /* Compact, professional background */
+    .fi-simple-layout {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+        padding: 1rem;
+    }
+    
+    /* Compact card design */
+    .fi-simple-main {
+        background: #ffffff !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        padding: 2rem 1.75rem !important;
+        max-width: 24rem !important;
+        margin: 0 auto !important;
+    }
+    
+    /* Dark mode support */
+    .dark .fi-simple-layout {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+    
+    .dark .fi-simple-main {
+        background: #1f2937 !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Compact spacing for form elements */
+    .fi-simple-main form {
+        margin-top: 1rem;
+    }
+    
+    /* Compact logo/branding area */
+    .fi-simple-main .fi-logo {
+        margin-bottom: 1rem;
+    }
+    
+    /* Compact heading typography */
+    .fi-simple-main h1,
+    .fi-simple-main h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+    
+    .dark .fi-simple-main h1,
+    .dark .fi-simple-main h2 {
+        color: #f9fafb;
+    }
+    
+    /* Compact subheading styling */
+    .fi-simple-main p,
+    .fi-simple-main .fi-simple-subheading {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.4;
+    }
+    
+    .dark .fi-simple-main p,
+    .dark .fi-simple-main .fi-simple-subheading {
+        color: #9ca3af;
+    }
+    
+    /* Compact form label styling */
+    .fi-simple-main label {
+        font-weight: 500;
+        color: #374151;
+        font-size: 0.8125rem;
+        margin-bottom: 0.375rem;
+    }
+    
+    .dark .fi-simple-main label {
+        color: #d1d5db;
+    }
+    
+    /* Compact input field improvements */
+    .fi-simple-main input[type="email"],
+    .fi-simple-main input[type="password"] {
+        border-radius: 0.375rem;
+        border: 1px solid #d1d5db;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        height: auto;
+    }
+    
+    .fi-simple-main input[type="email"]:focus,
+    .fi-simple-main input[type="password"]:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+    
+    .dark .fi-simple-main input[type="email"],
+    .dark .fi-simple-main input[type="password"] {
+        border-color: #4b5563;
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .dark .fi-simple-main input[type="email"]:focus,
+    .dark .fi-simple-main input[type="password"]:focus {
+        border-color: #60a5fa;
+    }
+    
+    /* Compact form field wrapper spacing */
+    .fi-simple-main .fi-input-wrp {
+        margin-bottom: 1rem;
+    }
+    
+    /* Compact checkbox spacing */
+    .fi-simple-main .fi-checkbox {
+        margin-bottom: 1rem;
+    }
+    
+    /* Compact button styling */
+    .fi-simple-main button[type="submit"] {
+        width: 100%;
+        padding: 0.625rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+        margin-top: 0.5rem;
+    }
+    
+    .fi-simple-main button[type="submit"]:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Reduce icon sizes */
+    .fi-simple-main .fi-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    /* Compact main container */
+    .fi-simple-main-ctn {
+        padding: 1rem 0;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        .fi-simple-main {
+            padding: 1.5rem 1.25rem !important;
+            max-width: 100% !important;
+            margin: 0.5rem !important;
+        }
+        
+        .fi-simple-layout {
+            padding: 0.5rem;
+        }
+    }
+</style>
+@endpush
+
+<x-filament-panels::page.simple>
+    @if (filament()->hasRegistration())
+        <x-slot name="subheading">
+            {{ __('filament-panels::pages/auth/login.actions.register.before') }}
+
+            {{ $this->registerAction }}
+        </x-slot>
+    @endif
+
+    {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, scopes: $this->getRenderHookScopes()) }}
+
+    <x-filament-panels::form id="form" wire:submit="authenticate">
+        {{ $this->form }}
+
+        <x-filament-panels::form.actions
+            :actions="$this->getCachedFormActions()"
+            :full-width="$this->hasFullWidthFormActions()"
+        />
+    </x-filament-panels::form>
+
+    {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, scopes: $this->getRenderHookScopes()) }}
+</x-filament-panels::page.simple>

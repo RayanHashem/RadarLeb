@@ -21,6 +21,12 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Users';
+
+    protected static ?string $navigationLabel = 'Users';
+
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
         return $form
@@ -35,17 +41,24 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-
                 Tables\Columns\TextColumn::make('phone_number')->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
-
                 Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('wallet_balance'),
                 Tables\Columns\TextColumn::make('amount_spent')
                     ->label('Amount Spent')
-                    ->getStateUsing(fn (User $u) =>
-                    GameUserStat::where('user_id', $u->id)->sum('amount_spent')
-                    ),
+                    ->summarize([
+                        Tables\Columns\Summarizers\Sum::make(),
+                    ])
+                    ->getStateUsing(function (User $record) {
+                        return GameUserStat::where('user_id', $record->id)->sum('amount_spent');
+                    })
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        return $query->leftJoin('game_user_stats', 'users.id', '=', 'game_user_stats.user_id')
+                            ->groupBy('users.id')
+                            ->orderByRaw('COALESCE(SUM(game_user_stats.amount_spent), 0) ' . $direction)
+                            ->select('users.*');
+                    }),
             ])
             ->actions([
                 /** Add-to-wallet */
@@ -59,21 +72,10 @@ class UserResource extends Resource
                     ->action(function (array $data, User $record) {
                         $record->increment('wallet_balance', $data['amount']);
                     }),
-
-                /** Change password */
-                Tables\Actions\Action::make('changePwd')
-                    ->label('Change Password')
-                    ->icon('heroicon-o-key')
-                    ->form([
-                        Forms\Components\TextInput::make('password')
-                            ->password()->required()->label('New password'),
-                    ])
-                    ->action(function (array $data, User $record) {
-                        $record->update(['password' => Hash::make($data['password'])]);
-                    }),
             ])
             ->headerActions([])   // no create button
-            ->paginated(false);
+            ->paginated([10, 20, 50])
+            ->defaultPaginationPageOption(10);
     }
 
     public static function getRelations(): array

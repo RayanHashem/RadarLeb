@@ -10,40 +10,26 @@ import { initializeTheme } from './composables/useAppearance';
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 // -----------------------------------------------------------
-// Service Worker Registration
-// TEMPORARILY DISABLED - Unregister all Service Workers to fix CSS loading issues
+// Service Worker Registration for PWA
+// Enables offline functionality and install prompt
 // -----------------------------------------------------------
 if ('serviceWorker' in navigator) {
-    // Immediately unregister all Service Workers and clear caches
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-        if (registrations.length > 0) {
-            console.log(`Unregistering ${registrations.length} Service Worker(s)...`);
-            registrations.forEach((registration) => {
-                registration.unregister().then((success) => {
-                    if (success) {
-                        console.log('Service Worker unregistered successfully');
-                    }
-                });
+    // Register service worker when the page loads
+    window.addEventListener('load', () => {
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+                console.log('Service Worker registered successfully:', registration.scope);
+                
+                // Check for updates periodically
+                setInterval(() => {
+                    registration.update();
+                }, 60000); // Check every minute
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
             });
-        }
-        
-        // Clear all caches
-        caches.keys().then((cacheNames) => {
-            if (cacheNames.length > 0) {
-                console.log(`Clearing ${cacheNames.length} cache(s)...`);
-                cacheNames.forEach((cacheName) => {
-                    caches.delete(cacheName).then((deleted) => {
-                        if (deleted) {
-                            console.log(`Cache "${cacheName}" deleted`);
-                        }
-                    });
-                });
-            }
-        });
     });
-    
-    // Prevent any new Service Worker registration
-    // Service Workers are completely disabled for now
 }
 
 

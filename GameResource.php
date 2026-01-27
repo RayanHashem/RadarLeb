@@ -25,17 +25,44 @@ class GameResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Manage Prizes';
+
+    protected static ?string $navigationGroup = 'Manage RadarLeb';
+
+    protected static ?int $navigationSort = 4;
+
+    protected static ?string $modelLabel = 'Prize';
+
+    protected static ?string $pluralModelLabel = 'Prizes';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->disabled(),
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('price')
-                    ->numeric()->prefix('$')->disabled(),
+                    ->numeric()
+                    ->prefix('$')
+                    ->required(),
                 Forms\Components\TextInput::make('price_to_play')
-                    ->numeric()->minValue(1)->required(),
+                    ->numeric()
+                    ->minValue(1)
+                    ->required(),
                 Forms\Components\TextInput::make('minimum_amount_for_winning')
-                    ->numeric()->minValue(1)->required(),
+                    ->label('Amount to win')
+                    ->numeric()
+                    ->minValue(1)
+                    ->required(),
+                Forms\Components\TextInput::make('draw_number')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('image_path')
+                    ->label('Image Path')
+                    ->maxLength(255),
+                Forms\Components\Toggle::make('is_enabled')
+                    ->label('Enabled')
+                    ->default(true),
             ])
             ->columns(2);
     }
@@ -51,7 +78,8 @@ class GameResource extends Resource
 
                 ToggleColumn::make('is_enabled'),
 
-                TextColumn::make('minimum_amount_for_winning'),
+                TextColumn::make('minimum_amount_for_winning')
+                    ->label('Amount to win'),
 
                 // ⬇️ New per-user spend progress
                 TextColumn::make('global_progress')
@@ -95,11 +123,12 @@ class GameResource extends Resource
                     }),
             ])
             ->actions([
-                EditAction::make()->modalHeading('Edit Game')
+                EditAction::make()->modalHeading('Edit Prize')
                     ->modalSubmitActionLabel('Save')
                     ->slideOver(),
             ])
-            ->paginated(false);
+            ->paginated([10, 20, 50])
+            ->defaultPaginationPageOption(10);
     }
 
     public static function getRelations(): array
@@ -118,6 +147,8 @@ class GameResource extends Resource
     {
         return [
             'index' => Pages\ListGames::route('/'),
+            'create' => Pages\CreateGame::route('/create'),
+            'edit' => Pages\EditGame::route('/{record}/edit'),
         ];
     }
 }

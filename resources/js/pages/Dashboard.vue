@@ -68,6 +68,58 @@
                     </div>
                 </template>
 
+                <template v-else-if="activeOverlay === 'select-vehicle'">
+                    <div class="select-vehicle-container">
+                        <h1 class="overlay-title">Please Choose a Vehicle to be Able to Scan</h1>
+                        <div class="prize-selection-row">
+                            <div 
+                                v-for="(prize, index) in prizes" 
+                                :key="prize.id"
+                                class="prize-selection-item"
+                                @click="selectPrizeFromPopup(prize.id)"
+                            >
+                                <img 
+                                    :src="getPrizeImage(prize.id)" 
+                                    :alt="prize.name"
+                                    class="prize-selection-image"
+                                />
+                                <div class="prize-selection-label">{{ prize.name }}</div>
+                                <div class="prize-selection-price">{{ formatPrice(prize.price) }}</div>
+                            </div>
+                        </div>
+                        <button class="a-btn a-btn-default" @click="activeOverlay = null">
+                            Continue
+                        </button>
+                    </div>
+                </template>
+
+                <template v-else-if="activeOverlay === 'insufficient-funds'">
+                    <div class="insufficient-funds-container">
+                        <h1 class="overlay-title">Please Fill Your Radar Cash to be Able to Select a Prize</h1>
+                        <div class="insufficient-funds-buttons">
+                            <button class="a-btn a-btn-primary" @click="goToHowToPlay">
+                                How to Play
+                            </button>
+                            <button class="a-btn a-btn-default" @click="activeOverlay = null">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <template v-else-if="activeOverlay === 'insufficient-balance'">
+                    <div class="insufficient-funds-container">
+                        <h1 class="overlay-title">
+                            You Need at Least {{ insufficientBalanceMinimum }} Radar Cash to Play This Prize, Please Recharge Your Balance
+                        </h1>
+                        <div class="insufficient-funds-buttons">
+                            <button class="a-btn a-btn-default" @click="activeOverlay = null">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
                 <template v-else-if="activeOverlay === 'settings'">
                     <div class="settings-container">
                         <h1 class="overlay-title">SETTINGS</h1>
@@ -333,11 +385,14 @@
     <audio id="hornSound" src="/assets/imgs/horn.mp3" preload="auto"></audio>
     <audio id="clickSound" src="/assets/imgs/click.mp3" preload="auto"></audio>
 
+    <!-- Mobile Install Prompt -->
+    <MobileInstallPrompt />
 </template>
 <script setup>
 import { ref, onMounted, computed, watch, nextTick, onUnmounted } from 'vue';
 import axios from 'axios';
 import { router, Link } from '@inertiajs/vue3';
+import MobileInstallPrompt from '@/components/MobileInstallPrompt.vue';
 
 const activeOverlay = ref(null);
 
@@ -348,9 +403,15 @@ const props = defineProps({
 });
 
 const prizes = ref(props.games);
-const selectedGameId = ref(props.selectedGameId ?? (prizes.value.length > 0 ? prizes.value[0]?.id : null));
+// Always start with no prize selected - reset on every page reload
+// This ensures no prize is automatically selected when the page loads
+const selectedGameId = ref(null);
 const walletBalance = ref(props.wallet_balance);
 const loading = ref(true);
+
+// Store insufficient balance popup data
+const insufficientBalancePrize = ref(null);
+const insufficientBalanceMinimum = ref(0);
 
 const radarOnline = ref(true);
 const scanning = ref(false);
@@ -384,13 +445,17 @@ const help = ref(false);
 const userLocation = ref({ lat: null, lng: null });
 const locationUrl = ref('https://www.google.com/maps?q=33.8938,35.5018'); // Default fallback location
 
-const canScan = computed(() => radarOnline.value && !scanning.value && selectedGameEnabled.value);
+// Allow scan button to be visible even when no prize is selected
+// The popup will handle the case when no prize is selected
+const canScan = computed(() => radarOnline.value && !scanning.value);
 
 const buttonText = computed(() => {
-    if (!selectedGameEnabled.value) return 'Coming soon';
+    // Show "Scan" normally even when no prize is selected (popup will handle it)
     if (scanning.value) return 'Scanning…';
     if (detectionStatus.value === 'found') return 'Antenna detected';
     if (detectionStatus.value === 'not-found') return 'Antenna not detected';
+    // Only show "Coming soon" if a prize is selected but disabled
+    if (selectedGameId.value !== null && !selectedGameEnabled.value) return 'Coming soon';
     return 'Scan';
 });
 
@@ -405,14 +470,49 @@ const buttonStyle = computed(() => {
 });
 
 const selectedGameEnabled = computed(() => {
+    // If no game is selected, return false (but button still shows, popup handles it)
+    if (selectedGameId.value === null || selectedGameId.value === undefined) {
+        return false;
+    }
     const g = prizes.value.find(p => p.id == selectedGameId.value);
-    return g ? !!g.is_enabled : true; // default true if missing
+    return g ? !!g.is_enabled : false; // default false if game not found
 });
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getMinimumBalanceForPrize(prizeId) {
+    // Map prize IDs to minimum balance requirements
+    // Based on game order: Mobile (1), Bike/Electronics (2), SUV (3), Muscle Car (4), Cash (5)
+    const minimumBalances = {
+        1: 0,  // Mobile - no minimum mentioned
+        2: 4,  // Bike/Electronics - need at least 4
+        3: 8,  // SUV - need at least 8
+        4: 24, // Muscle Car - need at least 24
+        5: 32, // Super Car/Cash - need at least 32
+    };
+    return minimumBalances[prizeId] || 0;
+}
+
 async function selectPrize(id) {
+    // Check if user has radar cash at all
+    if (walletBalance.value === 0 || walletBalance.value === null || walletBalance.value === undefined) {
+        activeOverlay.value = 'insufficient-funds';
+        playClickSound();
+        return;
+    }
+    
+    // Check minimum balance requirement for this specific prize
+    const minimumBalance = getMinimumBalanceForPrize(id);
+    if (minimumBalance > 0 && walletBalance.value < minimumBalance) {
+        // Store the prize info for the popup
+        insufficientBalancePrize.value = prizes.value.find(p => p.id === id);
+        insufficientBalanceMinimum.value = minimumBalance;
+        activeOverlay.value = 'insufficient-balance';
+        playClickSound();
+        return;
+    }
+    
     // Update UI immediately for instant visual feedback
     selectedGameId.value = id;
     updatePrizeSelectionUI();
@@ -421,6 +521,55 @@ async function selectPrize(id) {
     axios.post('/me/game', { game_id: id }).catch(error => {
         console.error("Failed to select prize:", error);
     });
+}
+
+function selectPrizeFromPopup(id) {
+    // Use the same selectPrize function which handles all checks
+    selectPrize(id);
+    // Only close popup if selection was successful (no error popups shown)
+    if (activeOverlay.value === 'select-vehicle') {
+        activeOverlay.value = null;
+    }
+    playClickSound();
+}
+
+function goToHowToPlay() {
+    activeOverlay.value = 'help';
+    playClickSound();
+}
+
+function getPrizeImage(prizeId) {
+    // Map prize IDs to their image paths based on the HTML structure
+    // Match the prize order: Mobile (1), Bike/Electronics (2), SUV (3), Muscle Car (4), Cash (5)
+    const prize = prizes.value.find(p => p.id === prizeId);
+    if (prize) {
+        // Use the prize name to determine the image
+        const name = prize.name.toLowerCase();
+        if (name.includes('mobile')) return '/assets/imgs/mobile1.png';
+        if (name.includes('bike') || name.includes('electronics')) return '/assets/imgs/be1.png';
+        if (name.includes('suv')) return '/assets/imgs/suv1.png';
+        if (name.includes('muscle')) return '/assets/imgs/muscle-car1.png';
+        if (name.includes('cash') || name.includes('super')) return '/assets/imgs/super-car1.png';
+    }
+    // Fallback to ID-based mapping
+    const imageMap = {
+        1: '/assets/imgs/mobile1.png',
+        2: '/assets/imgs/be1.png',
+        3: '/assets/imgs/suv1.png',
+        4: '/assets/imgs/muscle-car1.png',
+        5: '/assets/imgs/super-car1.png',
+    };
+    return imageMap[prizeId] || '/assets/imgs/mobile1.png';
+}
+
+function formatPrice(price) {
+    // Format price with commas and dollar sign
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(price);
 }
 const currentProgress = computed(() => {
     const g = prizes.value.find(p => p.id == selectedGameId.value)
@@ -472,7 +621,13 @@ function playScanSoundSequence() {
 }
 
 async function startScan() {
-    if (scanning.value) return;
+    if (scanning.value || !canScan.value) return;
+    // Show popup if no game is selected
+    if (selectedGameId.value === null || selectedGameId.value === undefined) {
+        activeOverlay.value = 'select-vehicle';
+        playClickSound();
+        return;
+    }
 
     playScanSoundSequence();
 
@@ -741,8 +896,8 @@ const updatePrizeSelectionUI = () => {
         const prizeId = prizes.value[index]?.id;
         const originalSrc = img.dataset.originalSrc;
 
-        // Check if this image's prize is selected
-        if (prizeId !== undefined && prizeId === selectedGameId.value) {
+        // Check if this image's prize is selected (only if selectedGameId is not null)
+        if (selectedGameId.value !== null && prizeId !== undefined && prizeId === selectedGameId.value) {
             // Switch to detected version
             const detectedSrc = img.dataset.detected;
             if (detectedSrc) {
@@ -762,6 +917,11 @@ let hornInterval = null;
 
 
 onMounted(() => {
+    // Always reset prize selection to null on page load/reload
+    // This ensures no prize is selected when the page loads
+    selectedGameId.value = null;
+    updatePrizeSelectionUI();
+    
     fetchRadarStatus();
     setInterval(fetchRadarStatus, 5_000);
 
@@ -1071,6 +1231,134 @@ watch(selectedGameId, updatePrizeSelectionUI);
     font-size: 0.8em;
     margin-top: 12px;
     text-align: center;
+}
+
+/* Select Vehicle Popup Styles */
+.select-vehicle-container {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+}
+
+.prize-selection-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+.prize-selection-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    background-color: rgba(102, 175, 219, 0.2);
+    border: 2px solid rgba(102, 175, 219, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.prize-selection-item:hover {
+    background-color: rgba(102, 175, 219, 0.4);
+    border-color: rgba(102, 175, 219, 0.8);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(102, 175, 219, 0.3);
+}
+
+.prize-selection-image {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 10px;
+    filter: brightness(1.2);
+}
+
+.prize-selection-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.prize-selection-price {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+}
+
+/* Insufficient Funds Popup Styles */
+.insufficient-funds-container {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+}
+
+.insufficient-funds-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+    align-items: center;
+}
+
+.a-btn-primary {
+    background-color: #66afdb;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 350px;
+}
+
+.a-btn-primary:hover {
+    background-color: #5aaefc;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 175, 219, 0.3);
+}
+
+@media (max-width: 768px) {
+    .prize-selection-row {
+        gap: 10px;
+    }
+    
+    .prize-selection-item {
+        padding: 10px;
+        min-width: 100px;
+    }
+    
+    .prize-selection-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .prize-selection-label {
+        font-size: 0.8rem;
+    }
+    
+    .prize-selection-price {
+        font-size: 0.7rem;
+    }
+    
+    .insufficient-funds-buttons {
+        gap: 12px;
+    }
+    
+    .a-btn-primary,
+    .a-btn-default {
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
 }
 
 </style>

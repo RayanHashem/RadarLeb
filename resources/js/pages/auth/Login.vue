@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
+import MobileInstallPrompt from '@/components/MobileInstallPrompt.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -66,6 +67,20 @@ const submit = () => {
                     />
                     <InputError :message="form.errors.password" variant="material" />
 
+                    <!-- Remember Me Checkbox -->
+                    <div class="d-flex align-items-center mb-3">
+                        <input
+                            type="checkbox"
+                            id="remember"
+                            class="form-check-input me-2"
+                            v-model="form.remember"
+                            :tabindex="3"
+                        />
+                        <label for="remember" class="form-check-label" style="color: white; cursor: pointer;">
+                            Remember me
+                        </label>
+                    </div>
+
                     <!-- Buttons and Forgot Password link, centered -->
                     <!-- Changed from flex-column to flex-row for side-by-side buttons -->
                     <div class="d-flex justify-content-center align-items-center gap-3 mt-4 w-100">
@@ -110,6 +125,8 @@ const submit = () => {
                 </form>
             </div>
         </div>
+        <!-- Mobile Install Prompt -->
+        <MobileInstallPrompt />
     </section>
 </template>
 
